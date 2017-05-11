@@ -1,0 +1,38 @@
+---
+
+- include: set-hostname.yml
+
+
+# Firewall Installation:
+- include: iptables-installed.yml
+#- include: iptables-not-installed.yml
+
+
+# Various Packages
+- name: "Install PolicyCoreUtils package for SELinux CLI"
+  yum:
+    name: policycoreutils
+    update_cache: yes
+    state: installed
+
+- name: "Install iproute package"
+  yum:
+    name: iproute
+    update_cache: yes
+    state: installed
+
+- name: "Install net-tools package"
+  yum:
+    name: net-tools
+    update_cache: yes
+    state: installed
+
+- name: "Install bind-utils package"
+  yum:
+    name: bind-utils
+    update_cache: yes
+    state: installed
+
+- name: "Update to lastest packages"
+  yum: name=* state=latest
+

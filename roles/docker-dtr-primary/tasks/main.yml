@@ -1,0 +1,57 @@
+---
+
+# Only setup firewall and restart docker if UCP has not already been deployed.  ie reruning playbook
+- stat: path=/root/swarm-replica-join.log
+  register: ucp_install_log
+
+- include: dtr-iptables.yml
+  when: ucp_install_log.stat.exists == False
+
+
+# Join swarm cluster as worker
+
+- name: "Wait for UCP controller to come up"
+  uri:
+    url: "https://{{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}/_ping"
+    validate_certs: no
+  register: ucp_primary
+  until: ucp_primary.status == 200
+  retries: 50
+  delay: 2
+
+- name: "Join replica to cluster"
+  shell: /bin/docker swarm join --token {{ hostvars[groups['ucp-primary'][0]]['worker_token'].stdout }} {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }} 2>&1 | /bin/tee -a /root/swarm-replica-join.log
+  args:
+    creates: /root/swarm-replica-join.log
+
+
+# Install DTR..
+
+# DTR install command example:
+#  docker run -it --rm docker/dtr install --debug \
+#                 --ucp-username admin --ucp-insecure-tls \
+#                 --ucp-url https://ucp1.example.com \                  # ucp primary, must resolve externally!
+#                 --ucp-node dtr1.example.com \                         # this DTR hostname (swarm member)
+#                 --dtr-external-url https://dtr.example.com            # external load bal fqdn, must pre exist
+
+- debug:
+   msg: "DTR Params: dtr-external-url: {{ dtr_external_fqdn }}, ucp-node: {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}, this-host: {{ fqdn }}"
+
+#- shell: echo "docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }}" > /root/install-dtr-primary.cmd
+#  args:
+#    creates: /root/install-dtr-primary.cmd
+
+- name: "Install the primary DTR node.."
+  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }} >> /root/install-dtr-primary.log 2>&1
+  args:
+    creates: /root/install-dtr-primary.log
+
+- name: "Obtain DTR Primary replica ID"
+  shell: /usr/bin/curl -ksi https://localhost | grep 'X-Replica-ID:' | awk '{print $2}'
+  register: dtr_replica_id
+  args:
+    warn: false
+
+- debug: 
+    msg: "dtr_replica_id: {{ dtr_replica_id.stdout }}"
+

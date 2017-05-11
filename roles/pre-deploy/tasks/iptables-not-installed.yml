@@ -1,0 +1,32 @@
+---
+
+# Incase you don't want local firewall on hosts, this task removes it
+# Note: need to comment out the firewall config lines in later tasks
+
+# firewalld service
+- name: "Check if firewalld installed"
+  yum:
+    list: firewalld
+  register: pkg
+
+- name: "Ensure firewalld is disabled"
+  systemd:
+    name: firewalld
+    enabled: no
+    state: stopped
+  when: pkg.results[0].yumstate == 'installed'
+
+
+# iptables service
+- name: "Check if iptables-services  installed"
+  yum:
+    list: iptables-services 
+  register: pkg2
+
+- name: "Ensure iptables-services not installed"
+  yum:
+    name: iptables-services
+    update_cache: yes
+    state: removed
+#  when: pkg2.results[0].yumstate == 'installed'
+

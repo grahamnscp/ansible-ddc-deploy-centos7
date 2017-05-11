@@ -1,0 +1,31 @@
+---
+
+# Use iptables-services instead of firewalld as doesn't play well with DTR
+
+# Remove firewalld service
+- name: "Check if firewalld installed"
+  yum:
+    list: firewalld
+  register: pkg
+
+- name: "Ensure firewalld is disabled"
+  systemd:
+    name: firewalld
+    enabled: no
+    state: stopped
+  when: pkg.results[0].yumstate == 'installed'
+
+# Install iptables service
+- name: "Install iptables-services"
+  yum:
+    name: iptables-services
+    update_cache: yes
+    state: installed
+
+- name: "Ensure iptables running"
+  systemd:
+    name: iptables
+    enabled: yes
+    state: started
+
+# Note whenever you restart the firewall it flushes any dynamic chains created by docker service

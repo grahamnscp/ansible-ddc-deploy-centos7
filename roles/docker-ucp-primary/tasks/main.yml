@@ -1,0 +1,32 @@
+---
+
+# Only setup firewall and restart docker if UCP has not already been deployed.  ie. reruning playbook
+- stat: path=/root/ucp-primary-install.log
+  register: ucp_install_log
+
+- include: ucp-iptables.yml
+  when: ucp_install_log.stat.exists == False
+
+
+- name: "Test if UCP primary controller already exists"
+  uri:
+    url: "https://localhost/_ping"
+    validate_certs: no
+  register: ucp_primary
+  ignore_errors: yes
+
+
+# Deploy UCP Primary if not already installed
+- include: ucp-primary.yml
+  when: ucp_primary.status != 200
+
+
+# Grab the Swarm join tokens, used in later tasks
+- name: "Get swarm manager join token"
+  shell: /bin/docker swarm join-token -q manager
+  register: master_token
+
+- name: "Get swarm worker join token"
+  shell: /bin/docker swarm join-token -q worker
+  register: worker_token
+

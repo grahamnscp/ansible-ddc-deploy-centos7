@@ -1,0 +1,62 @@
+---
+
+# Deploy docker-ee via docker store yum repo
+
+- name: "Install libselinux-python to allow file copy"
+  yum:
+    name: libselinux-python
+    state: present
+
+
+# setup the repo
+
+- name: "Create docker repo dockerurl yum vars"
+  template:
+    src: dockerurl.j2
+    dest: /etc/yum/vars/dockerurl
+    owner: root
+    group: root
+
+- name: "Add Docker yum repo"
+  template: 
+    src: docker-ee.repo.j2
+    dest: /etc/yum.repos.d/docker-ee.repo
+    owner: root
+    group: root
+
+
+# Install docker-ee package
+
+- name: "Install Docker package"
+  yum:
+    name: docker-ee
+    update_cache: yes
+    state: installed
+
+- name: "Ensure /etc/docker dir exists"
+  file:
+    path: /etc/docker
+    state: directory
+
+
+# Configure any daemon options using template; ex logging
+- name: "Configure Docker engine"
+  copy: 
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    force: no # don't overwrite if exists
+    owner: root
+    group: root
+
+# Example: to configure docker service options
+#- name: "Set MountFlags=slave"
+#  copy:
+#    src: mount_flags.conf
+#    dest: /etc/systemd/system/docker.service.d/
+
+- name: "Ensure docker engine is started" 
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+

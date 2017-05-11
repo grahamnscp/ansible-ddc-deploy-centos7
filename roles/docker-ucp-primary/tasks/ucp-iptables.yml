@@ -1,0 +1,21 @@
+---
+
+- name: "Opening ports for UCP-Primary"
+  copy:
+    src: iptables-ucp-master
+    dest: /etc/sysconfig/iptables
+    owner: root
+    group: root
+
+- name: "check selinux on changed iptables file"
+  command: restorecon -Rv /etc/sysconfig/iptables
+
+- name: "Restart iptables to load changes rules"
+  systemd:
+    name: iptables
+    state: restarted
+
+- name: "Restart Docker daemon after restarting iptables-services to reload dyamic chains"
+  systemd:
+    name: docker
+    state: restarted

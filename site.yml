@@ -1,0 +1,37 @@
+---
+
+# hosts:
+#[ucp-primary] ucp-manager1
+#[ucp-replica] ucp-manager2 ucp-manager3
+#[ucp-worker]  ucp-node1 ucp-node2
+#[dtr-primary] ucp-dtr1
+#[dtr-replica] ucp-dtr2 ucp-dtr3
+
+#- hosts: all
+#  roles:
+#  - ntp
+#  - pre-deploy
+#  - docker-ee-install
+
+- hosts: ucp-primary
+  roles:
+    - docker-ucp-primary
+
+- hosts: ucp-replica
+  serial: 1 # need to join one by one only
+  roles:
+    - docker-ucp-replica
+
+- hosts: ucp-worker
+  roles:
+    - docker-ucp-worker
+
+- hosts: dtr-primary
+  roles:
+    - docker-dtr-primary
+
+- hosts: dtr-replica
+  serial: 1 # need to join one by one only
+  roles:
+    - docker-dtr-replica
+

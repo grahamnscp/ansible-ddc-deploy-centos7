@@ -1,0 +1,14 @@
+#!/bin/sh
+
+/bin/docker pull docker/ucp-metrics:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-swarm:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-hrm:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-etcd:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-controller:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-dsinfo:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-compose:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-cfssl:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-auth-store:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-agent:{{ ucp_version|quote }}
+/bin/docker pull docker/ucp-auth:{{ ucp_version|quote }}
