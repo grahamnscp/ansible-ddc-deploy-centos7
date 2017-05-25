@@ -41,8 +41,8 @@
 
 # Configure any daemon options using template; ex logging
 - name: "Configure Docker engine"
-  copy: 
-    src: daemon.json
+  template: 
+    src: daemon.json.j2
     dest: /etc/docker/daemon.json
     force: no # don't overwrite if exists
     owner: root

@@ -16,11 +16,14 @@ ansible_ssh_private_key_file=~/.ssh/myusercert.pem
 # Timeout
 timeout=120
 
+# Docker Storage (storage_opts optional for Data and Metadata loop files)
+#   Note: should have separate disk device for docker devicemapper storage in production
+#storage_driver=overlay
+storage_driver=devicemapper
+#storage_opts=
+
 # Misc options
-ucp_version=2.1.3
-dtr_version=2.2.4		    
 deprecation_warnings=False
-storage_driver=overlay
 # replace dummy values..
 ucp_admin_password=ucpadminpasswordhere
 ucp_fqdn=ucp.example.com
@@ -28,8 +31,10 @@ dtr_fqdn=dtr.example.com
 domain_name=example.com
 docker_ee_url=https://storebits.docker.com/ee/linux/sub-ffffffff-ffff-ffff-ffff-ffffffffffff
 
+ucp_version=2.1.4
+dtr_version=2.2.4		    
 
-# Hack: DTR External DNS names are needed, use ec2 external names when DNS not set up for domain
+# Hack: DTR External DNS names are needed, use ec2 external names when DNS not set up for domain in route53
 ucp_ec2_fqdn=ec2-22-222-222-221.xx-west-2.compute.amazonaws.com
 dtr_external_fqdn=ec2-22-222-222-226.xx-west-2.compute.amazonaws.com
 
