@@ -17,24 +17,25 @@ ansible_ssh_private_key_file=~/.ssh/myusercert.pem
 timeout=120
 
 # Docker Storage (storage_opts optional for Data and Metadata loop files)
-#   Note: should have separate disk device for docker devicemapper storage in production
-#storage_driver=overlay
-storage_driver=devicemapper
-#storage_opts=
+docker_storage_device=/dev/xvdb
+# The storage configuration is set in roles/docker-ee-install/file/daemon.json
+#  storage_driver=devicemapper
+#  storage_opts="dm.thinpooldev=/dev/mapper/docker-thinpool","dm.use_deferred_removal=true","dm.use_deferred_deletion=true"
 
 # Misc options
 deprecation_warnings=False
-# replace dummy values..
+# replace these dummy values as required..
 ucp_admin_password=ucpadminpasswordhere
 ucp_fqdn=ucp.example.com
 dtr_fqdn=dtr.example.com
 domain_name=example.com
 docker_ee_url=https://storebits.docker.com/ee/linux/sub-ffffffff-ffff-ffff-ffff-ffffffffffff
 
+# Product versions to deploy:
 ucp_version=2.1.4
 dtr_version=2.2.4		    
 
-# Hack: DTR External DNS names are needed, use ec2 external names when DNS not set up for domain in route53
+# Hack: For DTR External DNS names are needed, use ec2 external names when DNS not set up for domain in route53
 ucp_ec2_fqdn=ec2-22-222-222-221.xx-west-2.compute.amazonaws.com
 dtr_external_fqdn=ec2-22-222-222-226.xx-west-2.compute.amazonaws.com
 

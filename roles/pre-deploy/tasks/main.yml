@@ -9,6 +9,12 @@
 
 
 # Various Packages
+- name: "Install LVM needed for devicemapper docker storage"
+  yum:
+    name: lvm2
+    update_cache: yes
+    state: installed
+
 - name: "Install PolicyCoreUtils package for SELinux CLI"
   yum:
     name: policycoreutils

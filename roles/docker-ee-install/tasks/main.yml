@@ -1,5 +1,13 @@
 ---
 
+# Setup docker storage
+- stat: path=/etc/lvm/profile/docker-thinpool.profile
+  register: thinpool_profile
+
+- include: docker-storage.yml
+  when: thinpool_profile.stat.exists == False
+
+
 # Deploy docker-ee via docker store yum repo
 
 - name: "Install libselinux-python to allow file copy"
@@ -39,14 +47,14 @@
     state: directory
 
 
-# Configure any daemon options using template; ex logging
+# Configure any daemon options
 - name: "Configure Docker engine"
-  template: 
-    src: daemon.json.j2
+  copy: 
+    src: daemon.json
     dest: /etc/docker/daemon.json
-    force: no # don't overwrite if exists
     owner: root
     group: root
+#    force: no # don't overwrite if exists
 
 # Example: to configure docker service options
 #- name: "Set MountFlags=slave"
