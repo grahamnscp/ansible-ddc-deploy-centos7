@@ -1,6 +1,6 @@
 {
   "storage-driver": "devicemapper",
-  "storage-opts": ["dm.thinpooldev=/dev/mapper/docker-thinpool", "dm.use_deferred_removal=true", "dm.use_deferred_deletion=true"],
+  "storage-opts": ["dm.thinpooldev=/dev/mapper/docker-thinpool", "dm.use_deferred_removal=true", "dm.use_deferred_deletion=false"],
   "log-driver": "journald",
   "log-level": "info",
   "log-opts": {
