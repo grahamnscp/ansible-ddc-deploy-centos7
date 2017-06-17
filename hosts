@@ -1,5 +1,8 @@
 # This is an example ansible 'hosts' file.
 
+# Replace with values from terraform output
+#    https://github.com/grahamnscp/terraform-ddc-create-nodes
+
 [all:vars]
 
 # for local VMs
@@ -35,10 +38,17 @@ docker_ee_url=https://storebits.docker.com/ee/linux/sub-ffffffff-ffff-ffff-ffff-
 ucp_version=2.1.4
 dtr_version=2.2.4		    
 
+
+# DTR storage
+dtr_s3_id=my-dtr-storage-bucket
+dtr_s3_arn=arn:aws:s3:::my-dtr-storage-bucket
+
+
+# Instances:
+#
 # Hack: For DTR External DNS names are needed, use ec2 external names when DNS not set up for domain in route53
 ucp_ec2_fqdn=ec2-22-222-222-221.xx-west-2.compute.amazonaws.com
 dtr_external_fqdn=ec2-22-222-222-226.xx-west-2.compute.amazonaws.com
-
 
 # Note extra columns; ansible_host (external aws IP ) and fqdn (name for sethostname) are used in the role tasks
 #  replace dummy values..

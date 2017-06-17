@@ -26,9 +26,9 @@
   roles:
     - docker-ucp-worker
 
-#- hosts: dtr-primary
-#  roles:
-#    - docker-dtr-primary
+- hosts: dtr-primary
+  roles:
+    - docker-dtr-primary
 
 #- hosts: dtr-replica
 #  serial: 1 # join replicas one by one

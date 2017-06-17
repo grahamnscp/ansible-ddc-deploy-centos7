@@ -37,14 +37,21 @@
 - debug:
    msg: "DTR Params: dtr-external-url: {{ dtr_external_fqdn }}, ucp-node: {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}, this-host: {{ fqdn }}"
 
-#- shell: echo "docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }}" > /root/install-dtr-primary.cmd
-#  args:
-#    creates: /root/install-dtr-primary.cmd
-
 - name: "Install the primary DTR node.."
   shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }} >> /root/install-dtr-primary.log 2>&1
   args:
     creates: /root/install-dtr-primary.log
+
+
+#######
+# WIP: --------------------> Reconfigure for S3 bucket here <--------------------
+#
+# example code:
+#
+# /usr/bin/curl --silent --output /dev/null --write-out '%{http_code}' -k -u $UCP_ADMIN_USER:$UCP_ADMIN_PASSWORD -X PUT "https://$DTR_ELB_HOSTNAME/api/v0/admin/settings/registry/simple" -d "{\"storage\":{\"delete\":{\"enabled\":true},\"maintenance\":{\"readonly\":{\"enabled\":false}},\"s3\":{\"rootdirectory\":\"\",\"region\":\"$REGION\",\"regionendpoint\":\"\",\"bucket\":\"$S3_BUCKET_NAME\",\"secure\": true}}}"
+#
+#######
+
 
 - name: "Obtain DTR Primary replica ID"
   shell: /usr/bin/curl -ksi https://localhost | grep 'X-Replica-ID:' | awk '{print $2}'
