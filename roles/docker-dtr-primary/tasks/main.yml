@@ -25,32 +25,46 @@
     creates: /root/swarm-replica-join.log
 
 
+# Pause before installing DTR to allow cluster to fully install
+#- pause:
+#    minutes: 1
+
+
 # Install DTR..
 
 # DTR install command example:
-#  docker run -it --rm docker/dtr install --debug \
-#                 --ucp-username admin --ucp-insecure-tls \
-#                 --ucp-url https://ucp1.example.com \                  # ucp primary, must resolve externally!
-#                 --ucp-node dtr1.example.com \                         # this DTR hostname (swarm member)
-#                 --dtr-external-url https://dtr.example.com            # external load bal fqdn, must pre exist
+# docker run -it --rm docker/dtr install --dtr-external-url https://dtr.example.com --ucp-node dtr1.example.com --ucp-username admin --ucp-insecure-tls --ucp-url https://ucp1.example.com
 
 - debug:
    msg: "DTR Params: dtr-external-url: {{ dtr_external_fqdn }}, ucp-node: {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}, this-host: {{ fqdn }}"
 
+
+- shell: echo "docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_fqdn|quote }}" > /root/install-dtr-primary.cmd
+  args:
+    creates: /root/install-dtr-primary.cmd
+
 - name: "Install the primary DTR node.."
-  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }} >> /root/install-dtr-primary.log 2>&1
+#  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }} >> /root/install-dtr-primary.log 2>&1
+  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_fqdn|quote }} 2>&1 | /usr/bin/tee -a /root/install-dtr-primary.log 
   args:
     creates: /root/install-dtr-primary.log
 
 
-#######
-# WIP: --------------------> Reconfigure for S3 bucket here <--------------------
-#
-# example code:
-#
-# /usr/bin/curl --silent --output /dev/null --write-out '%{http_code}' -k -u $UCP_ADMIN_USER:$UCP_ADMIN_PASSWORD -X PUT "https://$DTR_ELB_HOSTNAME/api/v0/admin/settings/registry/simple" -d "{\"storage\":{\"delete\":{\"enabled\":true},\"maintenance\":{\"readonly\":{\"enabled\":false}},\"s3\":{\"rootdirectory\":\"\",\"region\":\"$REGION\",\"regionendpoint\":\"\",\"bucket\":\"$S3_BUCKET_NAME\",\"secure\": true}}}"
-#
-#######
+# Pause to allow DTR to finish initialising
+#- pause:
+#    minutes: 1
+
+- name: "Reconfigure DTR primary to use S3 storage backend"
+  template:
+    src: reconfigure-dtr-storage.sh.j2
+    dest: /root/reconfigure-dtr-storage.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- shell: /bin/sh -x /root/reconfigure-dtr-storage.sh 2>&1 | /usr/bin/tee -a /root/reconfigure-dtr-storage.log 
+  args:
+    creates: /root/reconfigure-dtr-storage.log
 
 
 - name: "Obtain DTR Primary replica ID"

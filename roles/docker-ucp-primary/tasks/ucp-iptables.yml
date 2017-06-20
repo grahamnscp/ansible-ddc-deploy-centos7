@@ -15,7 +15,7 @@
     name: iptables
     state: restarted
 
-- name: "Restart Docker daemon after restarting iptables-services to reload dyamic chains"
+- name: "Restart Docker daemon after restarting iptables-services to reload dynamic chains"
   systemd:
     name: docker
     state: restarted

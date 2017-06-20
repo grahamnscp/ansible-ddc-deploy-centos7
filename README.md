@@ -5,7 +5,7 @@ Note: this repo is a WIP
 TODO: Shared storage for DTR cluster - DTR deployment commented out for now
 
 
-Deploy hosts with Terraform (or whatever) then hook the IP address, hostname, domainname etc values into the hosts file)
+Deploy hosts with Terraform (or whatever) then hook the IP address, hostname, domainname etc values into the hosts file
 
 NOTE: works best to accept the ssh keys for the IP addresses locally before running the playbook
 

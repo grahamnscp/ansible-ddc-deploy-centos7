@@ -36,10 +36,11 @@ docker_ee_url=https://storebits.docker.com/ee/linux/sub-ffffffff-ffff-ffff-ffff-
 
 # Product versions to deploy:
 ucp_version=2.1.4
-dtr_version=2.2.4		    
+dtr_version=2.2.5		    
 
 
 # DTR storage
+aws_region=xx-west-x
 dtr_s3_id=my-dtr-storage-bucket
 dtr_s3_arn=arn:aws:s3:::my-dtr-storage-bucket
 
