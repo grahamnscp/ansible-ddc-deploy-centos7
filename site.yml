@@ -7,11 +7,11 @@
 #[dtr-primary] ucp-dtr1
 #[dtr-replica] ucp-dtr2 ucp-dtr3
 
-#- hosts: all
-#  roles:
-#  - ntp
-#  - pre-deploy
-#  - docker-ee-install
+- hosts: all
+  roles:
+  - ntp
+  - pre-deploy
+  - docker-ee-install
 
 - hosts: ucp-primary
   roles:
@@ -30,8 +30,8 @@
   roles:
     - docker-dtr-primary
 
-#- hosts: dtr-replica
-#  serial: 1 # join replicas one by one
-#  roles:
-#    - docker-dtr-replica
+- hosts: dtr-replica
+  serial: 1 # join replicas one by one
+  roles:
+    - docker-dtr-replica
 
