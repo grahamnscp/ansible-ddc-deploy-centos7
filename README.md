@@ -6,22 +6,39 @@ There is a wrapper script that runs the Terraform apply and then uses it's outpu
 
 It was developed using a Centos 7.3 AMI but should work with RHEL 7.3 also.
 
-Docker EE versions used at time of deploy are: 
-  * engine 17.03-ee
+Docker EE versions used at time of development where: 
+  * docker-ee-17.03.2.ee.4-1.el7.centos.x86_64
   * UCP 2.1.4
   * DTR 2.2.5
 
-First polulate the following files with your specific values:
 
-Then run:
+### First populate the following files and parameters as required;
+
+  * files/docker_subscription.lic - needs populating with your licence file contents
+
+  * params.sh - 
+    * has variables to access AWS hosts,
+    * the UCP_ADMIN_PASSWORD is what you want your DDC admin password to be
+    * Add your DOCKER_EE_URL as per standard Docker Store setup
+    * Set required versions of UCP and DTR ex. 2.1.4 and 2.2.5
+
+  * terraform/terraform.tfvars - contains your AWS access key and secret values
+    * note: the key_name is the name of your AWS key without the .pem extension
+
+
+### To run:
+
+#### Terraform:
+
+This script performs a terraform apply in the terraform sub-directory and then generates an Ansible hosts file
 
 ```bash
    $ ./run-terrform.sh
 ```
 
-Check the generated Ansible *hosts* file looks good and then run the playbook:
+#### Ansible Playbook:
 
-Run command:
+Please check that the generated Ansible **hosts** file looks good and then run the playbook:
 
 ```bash
    $ ansible-playbook -i hosts -s site.yml
