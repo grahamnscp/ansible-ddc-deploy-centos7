@@ -47,24 +47,17 @@
     state: directory
 
 
-# Configure any daemon options
+# Configure any daemon options 
 - name: "Configure Docker engine"
   copy: 
     src: daemon.json
     dest: /etc/docker/daemon.json
     owner: root
     group: root
-#    force: no # don't overwrite if exists
-
-# Example: to configure docker service options
-#- name: "Set MountFlags=slave"
-#  copy:
-#    src: mount_flags.conf
-#    dest: /etc/systemd/system/docker.service.d/
 
 - name: "Ensure docker engine is started" 
   systemd:
     name: docker
-    state: restarted
+    state: started
     enabled: yes
 

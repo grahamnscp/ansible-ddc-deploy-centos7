@@ -25,54 +25,19 @@
     creates: /root/swarm-replica-join.log
 
 
-# Pause before installing DTR to allow cluster to fully install
-#- pause:
-#    minutes: 1
-
-
-# Install DTR..
-
-# DTR install command example:
-# docker run -it --rm docker/dtr install --dtr-external-url https://dtr.example.com --ucp-node dtr1.example.com --ucp-username admin --ucp-insecure-tls --ucp-url https://ucp1.example.com
-
-- debug:
-   msg: "DTR Params: dtr-external-url: {{ dtr_external_fqdn }}, ucp-node: {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}, this-host: {{ fqdn }}"
-
-
-- shell: echo "docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_fqdn|quote }}" > /root/install-dtr-primary.cmd
-  args:
-    creates: /root/install-dtr-primary.cmd
-
-- name: "Install the primary DTR node.."
-#  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_ec2_fqdn|quote }} >> /root/install-dtr-primary.log 2>&1
-  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --debug --dtr-external-url https://{{ dtr_external_fqdn|quote }} --ucp-node {{ fqdn|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_fqdn|quote }} 2>&1 | /usr/bin/tee -a /root/install-dtr-primary.log 
-  args:
-    creates: /root/install-dtr-primary.log
-
-
-# Pause to allow DTR to finish initialising
-#- pause:
-#    minutes: 1
-
-- name: "Reconfigure DTR primary to use S3 storage backend"
+# Pull dtr images ahead of time..
+- name: "Creating script to pull docker dtr images"
   template:
-    src: reconfigure-dtr-storage.sh.j2
-    dest: /root/reconfigure-dtr-storage.sh
+    src: pull-dtr-images.sh.j2
+    dest: /root/pull-dtr-images.sh
     owner: root
     group: root
     mode: 0755
 
-- shell: /bin/sh -x /root/reconfigure-dtr-storage.sh 2>&1 | /usr/bin/tee -a /root/reconfigure-dtr-storage.log 
+- name: "Pulling docker dtr images to speed up dtr install.."
+  shell: sh -x /root/pull-dtr-images.sh > /root/pull-dtr-images.log 2>&1
   args:
-    creates: /root/reconfigure-dtr-storage.log
-
-
-- name: "Obtain DTR Primary replica ID"
-  shell: /usr/bin/curl -ksi https://localhost | grep 'X-Replica-ID:' | awk '{print $2}'
-  register: dtr_replica_id
-  args:
-    warn: false
-
-- debug: 
-    msg: "dtr_replica_id: {{ dtr_replica_id.stdout }}"
+    executable: /bin/bash
+    chdir: /root
+    creates: /root/pull-dtr-images.log
 

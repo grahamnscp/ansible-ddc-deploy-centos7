@@ -42,3 +42,13 @@
 - name: "Update to lastest packages"
   yum: name=* state=latest
 
+
+# Add alias to root's .bashrc
+- lineinfile:
+    dest=/root/.bashrc
+    line="alias l='ls -latFrh'"
+    regexp="^.*latFrh.*$"
+    owner=root
+    state=present
+    insertafter=EOF
+

@@ -1,0 +1,17 @@
+---
+
+- name: "Obtain DTR Primary replica ID"
+  shell: /usr/bin/curl -ksi https://{{ dtr_external_fqdn|quote }} | grep 'X-Replica-ID:' | awk '{print $2}'
+  register: dtr_replica_id
+  args:
+    warn: false
+
+- shell: echo "/bin/docker run --rm docker/dtr:{{ dtr_version|quote }} join --ucp-node {{ fqdn|quote }} --ucp-insecure-tls --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-url https://{{ ucp_external_fqdn|quote }} --existing-replica-id {{ dtr_replica_id.stdout }}" > /root/dtr-replica-join.sh
+  args:
+    creates: /root/dtr-replica-join.sh
+
+- name: "Adding DTR replica.."
+  shell: /bin/sh -x /root/dtr-replica-join.sh 2>&1 | /bin/tee -a /root/dtr-replica-join.log
+  args:
+    creates: /root/dtr-replica-join.log
+

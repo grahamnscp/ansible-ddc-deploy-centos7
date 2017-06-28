@@ -6,7 +6,7 @@
     dest: /tmp
 
 - debug:
-   msg: "UCP Primary Install Params: Host: fqdn: {{ fqdn }} has internal ip: {{ ansible_default_ipv4['address'] }} and lb san: {{ ucp_fqdn }}"
+   msg: "UCP Primary Install Params: Host: fqdn: {{ fqdn }} has internal ip: {{ ansible_default_ipv4['address'] }} and lb san: {{ ucp_external_fqdn }}"
 
 - name: "Creating script to pull docker ucp images"
   template: 
@@ -25,7 +25,7 @@
 
 - name: "Install primary UCP controller"
   # Note: when /root/ucp-primary-install.log exists the command will not rerun
-  shell: /bin/docker run --rm --name ucp -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/docker_subscription.lic:/docker_subscription.lic    docker/ucp:{{ ucp_version|quote }} install --debug  --admin-username admin --admin-password {{ ucp_admin_password|quote }} --host-address {{ ansible_default_ipv4['address']|quote }} --san {{ fqdn|quote }} --san {{ ucp_fqdn|quote }} --san {{ ucp_ec2_fqdn|quote }} --san {{ dtr_fqdn|quote }} --san {{ dtr_external_fqdn|quote }} 2>&1 | /bin/tee -a /root/ucp-primary-install.log
+  shell: /bin/docker run --rm --name ucp -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/docker_subscription.lic:/docker_subscription.lic    docker/ucp:{{ ucp_version|quote }} install --admin-username admin --admin-password {{ ucp_admin_password|quote }} --host-address {{ ansible_default_ipv4['address']|quote }} --san {{ fqdn|quote }} --san {{ ucp_external_fqdn|quote }} --san {{ dtr_external_fqdn|quote }} 2>&1 | /bin/tee -a /root/ucp-primary-install.log
   args:
     executable: /bin/bash
     chdir: /root

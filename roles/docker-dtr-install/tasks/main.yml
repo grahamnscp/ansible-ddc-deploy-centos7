@@ -1,0 +1,47 @@
+---
+
+# Install DTR from Manager node
+
+- debug:
+   msg: "DTR Params: dtr-external-url: {{ dtr_external_fqdn }}, ucp-node: {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }}, this-host: {{ fqdn }} dtr-primary-node: {{ hostvars[groups['dtr-primary'][0]]['ansible_fqdn']|quote }}"
+
+- name: "Create DTR install script.."
+  shell: echo "/bin/docker run --rm docker/dtr:{{ dtr_version|quote }} install --dtr-external-url http://{{ dtr_external_fqdn|quote }} --ucp-node {{ hostvars[groups['dtr-primary'][0]]['ansible_fqdn']|quote }} --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-insecure-tls --ucp-url https://{{ ucp_external_fqdn|quote }}" > /root/install-dtr-primary.cmd
+  args:
+    creates: /root/install-dtr-primary.cmd
+
+- name: "Install the primary DTR node.."
+  shell: /bin/sh -x /root/install-dtr-primary.cmd 2>&1 | /usr/bin/tee -a /root/install-dtr-primary.log 
+  args:
+    creates: /root/install-dtr-primary.log
+
+
+# Pause to allow DTR to finish initialising
+#- pause:
+#    minutes: 2
+
+
+- name: "Obtain DTR Primary replica ID"
+  shell: /usr/bin/curl -ksi https://{{ dtr_external_fqdn|quote }} | grep 'X-Replica-ID:' | awk '{print $2}'
+  register: dtr_replica_id
+  args:
+    warn: false
+
+- debug: 
+    msg: "dtr_replica_id: {{ dtr_replica_id.stdout }}"
+
+
+# Reconfigure for S3 storage
+- name: "Reconfigure DTR primary to use S3 storage backend"
+  template:
+    src: reconfigure-dtr-storage.sh.j2
+    dest: /root/reconfigure-dtr-storage.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- shell: /bin/sh -x /root/reconfigure-dtr-storage.sh 2>&1 | /usr/bin/tee -a /root/reconfigure-dtr-storage.log 
+  args:
+    creates: /root/reconfigure-dtr-storage.log
+
+

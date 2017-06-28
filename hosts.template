@@ -1,0 +1,65 @@
+# Ansible 'hosts' template file file used to generate actual hosts file
+#
+# Param values a populated by run-terraform.sh
+#
+
+[all:vars]
+
+# for local VMs
+#ansible_user=root 
+#ansible_become=yes
+#ansible_become_pass=password
+
+# for AWS
+ansible_user=##ANSIBLE_USER##
+ansible_port=22
+ansible_become=yes
+ansible_ssh_private_key_file=##ANSIBLE_SSH_PRIVATE_KEY_FILE##
+
+# Timeout
+timeout=120
+
+# Docker Storage (storage_opts optional for Data and Metadata loop files)
+docker_storage_device=##DOCKER_STORAGE_DEVICE##
+# The storage configuration is set in roles/docker-ee-install/file/daemon.json
+#  storage_driver=devicemapper
+#  storage_opts="dm.thinpooldev=/dev/mapper/docker-thinpool","dm.use_deferred_removal=true","dm.use_deferred_deletion=false"
+
+# Misc options 
+deprecation_warnings=False
+ucp_admin_password=##UCP_ADMIN_PASSWORD##
+#
+domain_name=##DOMAIN_NAME##
+ucp_external_fqdn=##UCP_EXTERNAL_FQDN##
+dtr_external_fqdn=##DTR_EXTERNAL_FQDN##
+#
+docker_ee_url=##DOCKER_EE_URL##
+#
+ucp_version=##UCP_VERSION##
+dtr_version=##DTR_VERSION##
+
+# DTR storage
+aws_region=##REGION##
+dtr_s3_id=##DTR_S3_ID##
+dtr_s3_arn=##DTR_S3_ARN##
+
+# Instances:
+#
+[ucp-primary]
+ucp-manager1 ansible_host=##MANAGER_PUBLIC_IP_1##  fqdn=##MANAGER_NAME_1##
+
+[ucp-replica]
+ucp-manager2 ansible_host=##MANAGER_PUBLIC_IP_2##  fqdn=##MANAGER_NAME_2##
+ucp-manager3 ansible_host=##MANAGER_PUBLIC_IP_3##  fqdn=##MANAGER_NAME_3##
+
+[ucp-worker]
+ucp-node1 ansible_host=##WORKER_PUBLIC_IP_1##      fqdn=##WORKER_NAME_1##
+ucp-node2 ansible_host=##WORKER_PUBLIC_IP_2##      fqdn=##WORKER_NAME_2##
+
+[dtr-primary]
+ucp-dtr1 ansible_host=##DTR_PUBLIC_IP_1##          fqdn=##DTR_NAME_1##
+
+[dtr-replica]
+ucp-dtr2 ansible_host=##DTR_PUBLIC_IP_2##          fqdn=##DTR_NAME_2##
+ucp-dtr3 ansible_host=##DTR_PUBLIC_IP_3##          fqdn=##DTR_NAME_3##
+

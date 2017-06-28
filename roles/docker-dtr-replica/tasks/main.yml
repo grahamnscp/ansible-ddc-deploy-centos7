@@ -25,34 +25,19 @@
     creates: /root/swarm-replica-join.log
 
 
-# Install DTR..
+# Pull images ahead of time..
+- name: "Creating script to pull docker dtr images"
+  template:
+    src: pull-dtr-images.sh.j2
+    dest: /root/pull-dtr-images.sh
+    owner: root
+    group: root
+    mode: 0755
 
-- name: "Add ucp-primary hostname to local hosts file for join (if no DNS)"
-  lineinfile:
-    dest=/etc/hosts
-    line="{{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address']|quote }}   {{ hostvars[groups['ucp-primary'][0]]['ansible_fqdn']|quote }}"
-    regexp="^.*{{ hostvars[groups['ucp-primary'][0]]['ansible_fqdn']|quote }}.*$"
-    owner=root
-    state=present
-    insertafter=EOF
-
-- name: "Check DTR primary is up"
-  uri:
-    url: "https://{{ hostvars[groups['dtr-primary'][0]]['ansible_eth0']['ipv4']['address'] }}/_ping"
-    validate_certs: no
-  register: dtr_primary
-  until: dtr_primary.status == 200
-  retries: 10
-  delay: 2
-
-- debug:
-    msg: "docker run --rm docker/dtr:{{ dtr_version|quote }} join --debug --ucp-node {{ fqdn }} --ucp-insecure-tls --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-url https{{':'}}//{{ ucp_ec2_fqdn|quote }} --existing-replica-id {{ hostvars[groups['dtr-primary'][0]]['dtr_replica_id'].stdout }}"
-
-- shell: echo "docker run --rm docker/dtr:{{ dtr_version|quote }} join --debug --ucp-node {{ fqdn|quote }} --ucp-insecure-tls --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-url https://{{ ucp_fqdn|quote }} --existing-replica-id {{ hostvars[groups['dtr-primary'][0]]['dtr_replica_id'].stdout|quote }}" > /root/dtr-replica-join.cmd
+- name: "Pulling docker dtr images to speed up dtr install.."
+  shell: sh -x /root/pull-dtr-images.sh > /root/pull-dtr-images.log 2>&1
   args:
-    creates: /root/dtr-replica-join.cmd
+    executable: /bin/bash
+    chdir: /root
+    creates: /root/pull-dtr-images.log
 
-- name: "Join DTR replica"
-  shell: /bin/docker run --rm docker/dtr:{{ dtr_version|quote }} join --debug --ucp-node {{ fqdn|quote }} --ucp-insecure-tls --ucp-username admin --ucp-password {{ ucp_admin_password|quote }} --ucp-url https://{{ ucp_fqdn|quote }} --existing-replica-id {{ hostvars[groups['dtr-primary'][0]]['dtr_replica_id'].stdout|quote }} 2>&1 | /bin/tee -a /root/dtr-replica-join.log
-  args:
-    creates: /root/dtr-replica-join.log

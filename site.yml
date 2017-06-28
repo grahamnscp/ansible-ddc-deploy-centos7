@@ -1,6 +1,6 @@
 ---
 
-# hosts:
+# hosts reference:
 #[ucp-primary] ucp-manager1
 #[ucp-replica] ucp-manager2 ucp-manager3
 #[ucp-worker]  ucp-node1 ucp-node2
@@ -18,7 +18,7 @@
     - docker-ucp-primary
 
 - hosts: ucp-replica
-  serial: 1 # join replicas one by one
+  serial: 1 # join replicas one at a time
   roles:
     - docker-ucp-replica
 
@@ -31,7 +31,17 @@
     - docker-dtr-primary
 
 - hosts: dtr-replica
-  serial: 1 # join replicas one by one
+  serial: 1 # join replicas one at a time
   roles:
     - docker-dtr-replica
+
+# Note: better to install DTR primary from UCP manager node
+- hosts: ucp-primary
+  roles:
+    - docker-dtr-install
+
+- hosts: dtr-replica
+  serial: 1 # join replicas one at a time
+  roles:
+    - docker-dtr-add-replicas
 

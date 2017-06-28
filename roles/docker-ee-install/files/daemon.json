@@ -7,4 +7,3 @@
     "tag":"{{.ImageName}}/{{.Name}}/{{.ID}}"
   }
 }
-

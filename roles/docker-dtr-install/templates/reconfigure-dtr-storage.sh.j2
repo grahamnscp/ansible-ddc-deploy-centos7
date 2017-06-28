@@ -7,4 +7,4 @@ UCP_ADMIN_PASSWORD={{ ucp_admin_password|quote }}
 DTR_ELB_HOSTNAME={{ dtr_external_fqdn|quote }}
 
 /bin/curl --write-out '%{http_code}' -k -u $UCP_ADMIN_USER:$UCP_ADMIN_PASSWORD -X PUT "https://$DTR_ELB_HOSTNAME/api/v0/admin/settings/registry/simple" -d "{\"storage\":{\"delete\":{\"enabled\":true},\"maintenance\":{\"readonly\":{\"enabled\":false}},\"s3\":{\"rootdirectory\":\"\",\"region\":\"$REGION\",\"regionendpoint\":\"\",\"bucket\":\"$S3_BUCKET_NAME\",\"secure\": true}}}" 
-
+exit $?

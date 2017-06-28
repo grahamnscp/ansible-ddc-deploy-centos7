@@ -1,0 +1,13 @@
+#!/bin/sh
+
+/bin/docker pull docker/dtr:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-api:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-registry:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-postgres:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-rethink:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-jobrunner:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-garant:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-nginx:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-notary-signer:{{ dtr_version|quote }}
+/bin/docker pull docker/dtr-notary-server:{{ dtr_version|quote }}
+
