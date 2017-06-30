@@ -1,4 +1,4 @@
-# ansible-ddc-deploy-centos7
+# Automated Deploy of HA clustered Docker EE on AWS
 
 This repo contains a Terraform sub-directory that provisions AWS resources required to deploy an HA UCP cluster with an HA DTR cluster.
 
@@ -6,7 +6,8 @@ There is a wrapper script that runs the Terraform apply and then uses it's outpu
 
 It was developed using a Centos 7.3 AMI but should work with RHEL 7.3 also.
 
-Docker EE versions used at time of development where: 
+Docker EE versions used at time of development where:
+
   * docker-ee-17.03.2.ee.4-1.el7.centos.x86_64
   * UCP 2.1.4
   * DTR 2.2.5
@@ -16,7 +17,7 @@ Docker EE versions used at time of development where:
 
   * files/docker_subscription.lic - needs populating with your licence file contents
 
-  * params.sh - 
+  * params.sh -
     * has variables to access AWS hosts,
     * the UCP_ADMIN_PASSWORD is what you want your DDC admin password to be
     * Add your DOCKER_EE_URL as per standard Docker Store setup
@@ -26,7 +27,8 @@ Docker EE versions used at time of development where:
     * note: the key_name is the name of your AWS key without the .pem extension
 
 
-### To run:
+### To run
+
 
 #### Terraform:
 
