@@ -35,7 +35,7 @@ Docker EE versions used at time of development where:
 This script performs a terraform apply in the terraform sub-directory and then generates an Ansible hosts file
 
 ```bash
-   $ ./run-terrform.sh
+   $ ./run-terraform.sh
 ```
 
 #### Ansible Playbook:
