@@ -39,6 +39,12 @@
     update_cache: yes
     state: installed
 
+- name: "Install bridge-utils package"
+  yum:
+    name: bridge-utils
+    update_cache: yes
+    state: installed
+
 - name: "Update to lastest packages"
   yum: name=* state=latest
 
