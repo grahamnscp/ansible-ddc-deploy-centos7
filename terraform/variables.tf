@@ -11,7 +11,7 @@ variable "domainname" {
 # Existing route53 zone_id to add sub domain entries to:
 variable "route53_zone_id" {
   description = "Existing Route53 zone"
-  defualt = "my existing route53 zone id here"
+  default = "my existing route53 zone id here"
 }
 
 #
