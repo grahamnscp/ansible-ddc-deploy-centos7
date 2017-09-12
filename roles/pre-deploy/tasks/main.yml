@@ -8,6 +8,16 @@
 #- include: iptables-not-installed.yml
 
 
+# Add alias to root's .bashrc
+- lineinfile:
+    dest=/root/.bashrc
+    line="alias l='ls -latFrh'"
+    regexp="^.*latFrh.*$"
+    owner=root
+    state=present
+    insertafter=EOF
+
+
 # Various Packages
 - name: "Install LVM needed for devicemapper docker storage"
   yum:
@@ -45,16 +55,13 @@
     update_cache: yes
     state: installed
 
-- name: "Update to lastest packages"
-  yum: name=* state=latest
+#- name: "Install nfs-utils package"
+#  yum:
+#    name: nfs-utils
+#    update_cache: yes
+#    state: installed
 
 
-# Add alias to root's .bashrc
-- lineinfile:
-    dest=/root/.bashrc
-    line="alias l='ls -latFrh'"
-    regexp="^.*latFrh.*$"
-    owner=root
-    state=present
-    insertafter=EOF
+# Update to latest patches and reboot if necessary
+- include: update-packages.yml
 

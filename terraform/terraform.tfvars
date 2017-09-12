@@ -1,3 +1,0 @@
-access_key = "<YOUR ACCESS KEY HERE>"
-secret_key = "<YOUR ACCESS KEY SECRET HERE>
-key_name = "<YOUR SSH KEY PEM FILE NAME HERE>"

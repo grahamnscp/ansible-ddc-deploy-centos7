@@ -27,6 +27,7 @@ docker_storage_device=##DOCKER_STORAGE_DEVICE##
 
 # Misc options 
 deprecation_warnings=False
+ucp_admin_username=##UCP_ADMIN_USERNAME##
 ucp_admin_password=##UCP_ADMIN_PASSWORD##
 #
 domain_name=##DOMAIN_NAME##
@@ -34,6 +35,12 @@ ucp_external_fqdn=##UCP_EXTERNAL_FQDN##
 dtr_external_fqdn=##DTR_EXTERNAL_FQDN##
 #
 docker_ee_url=##DOCKER_EE_URL##
+docker_ee_release=##DOCKER_EE_RELEASE##
+#
+docker_hub_org=##DOCKER_HUB_ORG##
+docker_hub_org_dtr=##DOCKER_HUB_ORG_DTR##
+docker_hub_username=##DOCKER_HUB_USERNAME##
+docker_hub_password=##DOCKER_HUB_PASSWORD##
 #
 ucp_version=##UCP_VERSION##
 dtr_version=##DTR_VERSION##
@@ -52,14 +59,9 @@ ucp-manager1 ansible_host=##MANAGER_PUBLIC_IP_1##  fqdn=##MANAGER_NAME_1##
 ucp-manager2 ansible_host=##MANAGER_PUBLIC_IP_2##  fqdn=##MANAGER_NAME_2##
 ucp-manager3 ansible_host=##MANAGER_PUBLIC_IP_3##  fqdn=##MANAGER_NAME_3##
 
-[ucp-worker]
-ucp-node1 ansible_host=##WORKER_PUBLIC_IP_1##      fqdn=##WORKER_NAME_1##
-ucp-node2 ansible_host=##WORKER_PUBLIC_IP_2##      fqdn=##WORKER_NAME_2##
-
 [dtr-primary]
 ucp-dtr1 ansible_host=##DTR_PUBLIC_IP_1##          fqdn=##DTR_NAME_1##
 
 [dtr-replica]
 ucp-dtr2 ansible_host=##DTR_PUBLIC_IP_2##          fqdn=##DTR_NAME_2##
 ucp-dtr3 ansible_host=##DTR_PUBLIC_IP_3##          fqdn=##DTR_NAME_3##
-

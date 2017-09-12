@@ -1,17 +1,17 @@
 # Global Variables:
 
 variable "name_prefix" {
-  default = "my"
+  default = "##TF_AWS_INSTANCE_PREFIX##"
 }
 
 variable "domainname" {
-  default = "sub.example.com"
+  default = "##TF_AWS_DOMAINNAME##"
 }
 
 # Existing route53 zone_id to add sub domain entries to:
 variable "route53_zone_id" {
   description = "Existing Route53 zone"
-  default = "my existing route53 zone id here"
+  default = "##TF_AWS_ROUTE53_ZONE_ID##"
 }
 
 #
@@ -20,35 +20,55 @@ variable "secret_key" {}
 variable "key_name" {}
 #variable "public_key" {}
 
+variable "ws2k16_admin_password" {
+  default = "##WS2K16_ADMIN_PASSWORD##"
+}
+
+variable "ws2k16_ssh_key_pub" {
+  default = "##WS2K16_SSH_KEY_PUB##"
+}
+
+variable "ws2k16_docker_win_url" {
+  default = "##WS2K16_DOCKER_WIN_URL##"
+}
+
 variable "aws_region" {
 #  default = "us-west-2"
-  default = "eu-west-2"
+  default = "##TF_AWS_REGION##"
 }
 
 variable "availability_zones" {
 #  default = "us-west-2a,us-west-2b,us-west-2c"
-  default = "eu-west-2a,eu-west-2b"
+  default = "##TF_AWS_AVAILABILITY_ZONES##"
 }
 
 variable "aws_centos_ami" {
-#  default = "ami-d2c924b2" # centos 7 us-west-2
-  default = "ami-bb373ddf" # centos 7 eu-west-2
+  default = "##TF_AWS_CENTOS_AMI##"
+}
+
+variable "aws_ws2k16_ami" {
+  default = "##TF_AWS_WS2K16_AMI##"
 }
 
 #
 variable "docker_volume_size" {
   description = "Size in GB for the second volume attached to the instance used for docker devmapper pool"
-  default=31
+  default = ##TF_AWS_DOCKER_VOLUME_SIZE##
 }
 
 variable "ucp_manager_count" {
   description = "Number of manager nodes, needs to be 3, 5 or 7"
-  default = 3
+  default = ##TF_AWS_UCP_MANAGER_COUNT##
 }
 
 variable "ucp_worker_count" {
-  description = "Number of worker nodes"
-  default = 2
+  description = "Number of linux worker nodes"
+  default = ##TF_AWS_UCP_WORKER_COUNT##
+}
+
+variable "ucp_winwork_count" {
+  description = "Number of windows worker nodes"
+  default = ##TF_AWS_UCP_WINWORK_COUNT##
 }
 
 variable "ucp_dtr_count" {
@@ -57,15 +77,19 @@ variable "ucp_dtr_count" {
 }
 
 variable "manager_instance_type" {
-  default = "t2.large"
+  default = "##TF_AWS_MANAGER_INSTANCE_TYPE##"
 }
 
 variable "worker_instance_type" {
-  default = "t2.large"
+  default = "##TF_AWS_WORKER_INSTANCE_TYPE##"
+}
+
+variable "winwork_instance_type" {
+  default = "##TF_AWS_WINWORK_INSTANCE_TYPE##"
 }
 
 variable "dtr_instance_type" {
-  default = "t2.large"
+  default = "##TF_AWS_DTR_INSTANCE_TYPE##"
 }
 
 variable "ucp_dns" {

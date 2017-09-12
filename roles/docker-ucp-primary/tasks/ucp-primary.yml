@@ -16,16 +16,24 @@
     group: root
     mode: 0755
 
-- name: "Pulling docker ucp images to speed up ucp install.."
-  shell: sh -x /root/pull-ucp-images.sh > /root/pull-ucp-images.log 2>&1
+- name: "Pulling docker ucp images required for install.."
+  shell: sh /root/pull-ucp-images.sh {{ docker_hub_username|quote}} {{ docker_hub_password|quote }} > /root/pull-ucp-images.log 2>&1
   args:
     executable: /bin/bash
     chdir: /root
     creates: /root/pull-ucp-images.log
 
+- name: "Create ucp primary install script"
+  template: 
+    src: ucp-primary-install.sh.j2
+    dest: /root/ucp-primary-install.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: "Install primary UCP controller"
   # Note: when /root/ucp-primary-install.log exists the command will not rerun
-  shell: /bin/docker run --rm --name ucp -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/docker_subscription.lic:/docker_subscription.lic    docker/ucp:{{ ucp_version|quote }} install --admin-username admin --admin-password {{ ucp_admin_password|quote }} --host-address {{ ansible_default_ipv4['address']|quote }} --san {{ fqdn|quote }} --san {{ ucp_external_fqdn|quote }} --san {{ dtr_external_fqdn|quote }} 2>&1 | /bin/tee -a /root/ucp-primary-install.log
+  shell: sh /root/ucp-primary-install.sh {{ ucp_admin_username|quote }} {{ ucp_admin_password|quote }} > /root/ucp-primary-install.log 2>&1
   args:
     executable: /bin/bash
     chdir: /root

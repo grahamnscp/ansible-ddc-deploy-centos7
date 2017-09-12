@@ -23,6 +23,7 @@ resource "aws_elb" "ucp" {
     }
 
     instances = ["${aws_instance.ucp-manager.*.id}"]
+    idle_timeout = 240
     cross_zone_load_balancing = true
 }
 
@@ -75,6 +76,7 @@ resource "aws_elb" "dtr" {
     }
 
     instances = ["${aws_instance.ucp-dtr.*.id}"]
+    idle_timeout = 240
     cross_zone_load_balancing = true
 }
 

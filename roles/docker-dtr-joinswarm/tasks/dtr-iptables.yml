@@ -1,0 +1,22 @@
+---
+
+- name: "Opening ports for DTR"
+  copy:
+    src: iptables-dtr
+    dest: /etc/sysconfig/iptables
+    owner: root
+    group: root
+
+- name: "check selinux on changed iptables file"
+  command: /usr/sbin/restorecon -Rv /etc/sysconfig/iptables
+
+- name: "Restart iptables to load changes rules"
+  systemd:
+    name: iptables
+    state: restarted
+
+- name: "Restart Docker daemon after restarting iptables-services to reload dynamic chains"
+  systemd:
+    name: docker
+    state: restarted
+

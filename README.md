@@ -2,15 +2,11 @@
 
 This repo contains a Terraform sub-directory that provisions AWS resources required to deploy an HA UCP cluster with an HA DTR cluster.
 
-There is a wrapper script that runs the Terraform apply and then uses it's output to generate the Ansible hosts file for the Ansible playbook deploy of the DDC software.
+There is a wrapper script called run-terraform.sh which generates the various configuration files required from the deployment from the personalised values specified in the params.sh file.
 
-It was developed using a Centos 7.3 AMI but should work with RHEL 7.3 also.
+The script Terraform apply and then uses it's output to generate the Ansible hosts file for the Ansible playbook deploy of the DDC software.
 
-Docker EE versions used at time of development where:
-
-  * docker-ee-17.03.2.ee.4-1.el7.centos.x86_64
-  * UCP 2.1.4
-  * DTR 2.2.5
+This repo was developed using a Centos 7.3 AMI but should work with RHEL 7.3 also.
 
 
 ### First populate the following files and parameters as required;
@@ -37,6 +33,13 @@ This script performs a terraform apply in the terraform sub-directory and then g
 ```bash
    $ ./run-terraform.sh
 ```
+
+Check variables in the auto-generated files:
+
+  * terraform/terraform.tfvars
+  * terraform/variables.tf
+  * hosts
+
 
 #### Ansible Playbook:
 

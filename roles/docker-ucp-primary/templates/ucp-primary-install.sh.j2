@@ -1,0 +1,35 @@
+#!/bin/sh
+
+DOCKER_HUB_ORG={{ docker_hub_org|quote }}
+UCP_ADMIN_USERNAME=$1
+UCP_ADMIN_PASSWORD=$2
+
+if [ "$DOCKER_HUB_ORG" != "docker" ]
+then
+  echo "Using non-default dockerhub org; $DOCKER_HUB_ORG"
+
+  /bin/docker run --rm --name ucp \
+                  --security-opt label=disable \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v /tmp/docker_subscription.lic:/config/docker_subscription.lic \
+                  {{ docker_hub_org|quote}}/ucp:{{ ucp_version|quote }} install --image-version "dev:" \
+                  --admin-username "$UCP_ADMIN_USERNAME" --admin-password "$UCP_ADMIN_PASSWORD" \
+                  --host-address {{ ansible_default_ipv4['address']|quote }} \
+                  --san {{ fqdn|quote }} \
+                  --san {{ ucp_external_fqdn|quote }} \
+                  --san {{ dtr_external_fqdn|quote }}
+else
+  /bin/docker run --rm --name ucp \
+                  --security-opt label=disable \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v /tmp/docker_subscription.lic:/config/docker_subscription.lic \
+                  {{ docker_hub_org|quote}}/ucp:{{ ucp_version|quote }} install \
+                  --admin-username "$UCP_ADMIN_USERNAME" --admin-password "$UCP_ADMIN_PASSWORD" \
+                  --host-address {{ ansible_default_ipv4['address']|quote }} \
+                  --san {{ fqdn|quote }} \
+                  --san {{ ucp_external_fqdn|quote }} \
+                  --san {{ dtr_external_fqdn|quote }}
+fi
+
+# Sleep to allow UCP manager to fully come up (added here as won't hold up subsequent playbook runs)
+sleep 360

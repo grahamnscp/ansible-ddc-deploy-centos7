@@ -1,13 +1,13 @@
 #!/bin/sh
 
-/bin/docker pull docker/dtr:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-api:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-registry:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-postgres:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-rethink:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-jobrunner:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-garant:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-nginx:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-notary-signer:{{ dtr_version|quote }}
-/bin/docker pull docker/dtr-notary-server:{{ dtr_version|quote }}
+DOCKER_HUB_ORG={{ docker_hub_org_dtr|quote }}
 
+if [ "$DOCKER_HUB_ORG" != "docker" ]
+then
+  echo "Using non-default dockerhub org; $DOCKER_HUB_ORG"
+  DOCKER_HUB_USERNAME=$1
+  DOCKER_HUB_PASSWORD=$2
+  /bin/docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+fi
+
+/bin/docker run --rm {{ docker_hub_org_dtr|quote }}/dtr:{{ dtr_version }} images | xargs -L 1 docker pull

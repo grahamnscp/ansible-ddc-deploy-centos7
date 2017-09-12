@@ -1,0 +1,20 @@
+#!/bin/sh
+
+UCP_ADMIN_USERNAME=$1
+UCP_ADMIN_PASSWORD=$2
+
+/bin/docker run --rm --name dtr \
+                --security-opt label=disable \
+                {{ docker_hub_org_dtr|quote }}/dtr:{{ dtr_version|quote }} install \
+                --debug \
+                --dtr-external-url http://{{ dtr_external_fqdn|quote }} \
+                --ucp-node {{ hostvars[groups['dtr-primary'][0]]['ansible_fqdn']|quote }} \
+                --ucp-username "$UCP_ADMIN_USERNAME" --ucp-password "$UCP_ADMIN_PASSWORD" \
+                --ucp-insecure-tls \
+                --ucp-url https://{{ ucp_external_fqdn|quote }}
+RET_STAT=$?
+
+# Sleep to allow DTR to fully come up (added here as won't hold up subsequent playbook runs)
+sleep 180
+
+exit $RET_STAT

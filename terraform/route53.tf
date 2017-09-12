@@ -65,6 +65,16 @@ resource "aws_route53_record" "ucp-worker" {
   records = ["${element(aws_instance.ucp-worker.*.public_ip, count.index)}"]
 }
 
+resource "aws_route53_record" "ucp-winwork" {
+  count = "${var.ucp_winwork_count}"
+#  zone_id = "${aws_route53_zone.ddc.zone_id}"
+  zone_id = "${var.route53_zone_id}"
+  name = "ucp-winwork${count.index + 1}.${var.domainname}"
+  type = "A"
+  ttl = "300"
+  records = ["${element(aws_instance.ucp-winwork.*.public_ip, count.index)}"]
+}
+
 resource "aws_route53_record" "ucp-dtr" {
   count = "${var.ucp_dtr_count}"
 #  zone_id = "${aws_route53_zone.ddc.zone_id}"

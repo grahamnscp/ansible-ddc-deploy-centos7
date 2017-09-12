@@ -17,8 +17,23 @@
   retries: 50
   delay: 2
 
+- name: "Creating script to pull docker ucp images"
+  template:
+    src: pull-ucp-images.sh.j2
+    dest: /root/pull-ucp-images.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Pulling docker ucp images required for install.."
+  shell: sh /root/pull-ucp-images.sh {{ docker_hub_username|quote}} {{ docker_hub_password|quote }} > /root/pull-ucp-images.log 2>&1
+  args:
+    executable: /bin/bash
+    chdir: /root
+    creates: /root/pull-ucp-images.log
+
 - name: "Join replica to cluster"
-  shell: /bin/docker swarm join --token {{ hostvars[groups['ucp-primary'][0]]['master_token'].stdout }} {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }} 2>&1 | /bin/tee -a /root/swarm-replica-join.log
+  shell: /bin/docker swarm join --token {{ hostvars[groups['ucp-primary'][0]]['master_token'].stdout }} {{ hostvars[groups['ucp-primary'][0]]['ansible_eth0']['ipv4']['address'] }} ; sleep 180 2>&1 | /bin/tee -a /root/swarm-replica-join.log
   args:
     creates: /root/swarm-replica-join.log
 

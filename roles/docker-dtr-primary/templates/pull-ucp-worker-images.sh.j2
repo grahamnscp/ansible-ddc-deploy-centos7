@@ -8,10 +8,10 @@ then
   DOCKER_HUB_USERNAME=$1
   DOCKER_HUB_PASSWORD=$2
   /bin/docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
-  docker run --rm {{ docker_hub_org|quote }}/ucp:{{ ucp_version }} images --list --image-version dev: | xargs -L 1 docker pull
-else
-  docker run --rm {{ docker_hub_org|quote }}/ucp:{{ ucp_version }} images --list | xargs -L 1 docker pull
-
 fi
+
+docker pull {{ docker_hub_org|quote }}/ucp:{{ ucp_version }} 
+docker pull {{ docker_hub_org|quote }}/ucp-agent:{{ ucp_version }} 
+docker pull {{ docker_hub_org|quote }}/ucp-hrm:{{ ucp_version }} 
 
 

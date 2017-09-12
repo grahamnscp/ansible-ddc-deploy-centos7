@@ -1,0 +1,15 @@
+#!/bin/sh
+
+UCP_ADMIN_USERNAME=$1
+UCP_ADMIN_PASSWORD=$2
+
+echo "Temporary long sleep! before adding DTR replica to let some networking cache timeout for temporary containers"
+sleep 120
+
+/bin/docker run --rm {{ docker_hub_org_dtr|quote }}/dtr:{{ dtr_version|quote }} join \
+                --debug \
+                --ucp-node {{ fqdn|quote }} \
+                --ucp-insecure-tls \
+                --ucp-username "$UCP_ADMIN_USERNAME" --ucp-password "$UCP_ADMIN_PASSWORD" \
+                --ucp-url https://{{ ucp_external_fqdn|quote }} \
+                --existing-replica-id {{ dtr_replica_id.stdout }}

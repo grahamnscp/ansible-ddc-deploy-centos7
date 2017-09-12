@@ -16,6 +16,13 @@ resource "aws_security_group" "ddc" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    # best to comment RDP access out after initial deployment testing!
+    ingress {
+        from_port = 3389
+        to_port = 3389
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
     ingress {
         from_port = 0
         to_port = 0
