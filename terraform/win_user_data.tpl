@@ -5,11 +5,13 @@ echo "$timestamp : *** UserData Started ***"  > ~/userdata.log
 
 echo "parameters:"  >> ~/userdata.log
 echo "  p_hostname: ${p_hostname}" >> ~/userdata.log
+echo "  p_domainname: ${p_domainname}" >> ~/userdata.log
 #echo "  p_adminpwd: ${p_adminpwd}" >> ~/userdata.log
 #echo "  p_sshkey: ${p_sshkey}" >> ~/userdata.log
 echo "  p_dockerwinurl: ${p_dockerwinurl}" >> ~/userdata.log
 
 $newhostname = "${p_hostname}"
+$newdomainname = "${p_domainname}"
 $adminpwd = "${p_adminpwd}"
 $pubkey = "${p_sshkey}"
 $dockerwinurl = "${p_dockerwinurl}"
@@ -25,7 +27,11 @@ $localadminstr = ("WinNT://" + $temphostname + "/Administrator")
 # set hostname
 #
 Rename-Computer -NewName "$newhostname"
-
+$computerName = $env:computername                                                                                               
+$DNSSuffix = "$newdomainname"                                                                                               
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\" -Name Domain -Value $DNSSuffix                     
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\" -Name "NV Domain" -Value $DNSSuffix                
+Set-DnsClientGlobalSetting -SuffixSearchList $DNSSuffix 
 
 #echo "ssh key - 1.."  >> ~/userdata.log
 # Generate ssh authorized keys file and add pubkey (finish off after openssh installed)
@@ -148,7 +154,6 @@ $timestamp = Get-Date -Format o | foreach {$_ -replace ":", "."}
 echo "$timestamp : *** Infra config complete:"  >> ~\userdata.log
 
 
-
 Push-Location ~\
 
 echo "docker-ee - download.."  >> ~\userdata.log
@@ -167,34 +172,9 @@ $env:path += ";$env:ProgramFiles\docker"
 $newPath = "$env:ProgramFiles\docker;" + [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("PATH", $newPath, [EnvironmentVariableTarget]::Machine)
 
-
-echo "docker-ee - service - define.."  >> ~\userdata.log
+echo "docker-ee service - define.."  >> ~\userdata.log
 dockerd --register-service
 Set-Service docker -StartupType Automatic
-
-echo "docker-ee - service - start.."  >> ~\userdata.log
-Start-Service docker
-
-echo "docker version:" >> ~\userdata.log
-docker version >> ~/userdata.log
-
-
-echo "Setting up Docker daemon to listen on port 2376 with TLS" >> ~\userdata.log
-if (!(Test-Path C:\ProgramData\docker\daemoncerts\key.pem)) {                                                                   
-    echo "Generating new certs at C:\ProgramData\docker\daemoncerts" >> ~\userdata.log
-    New-Item -ItemType directory -Path C:\ProgramData\docker\daemoncerts | Out-Null;                                            
-    docker run --rm -v C:\ProgramData\docker\daemoncerts:C:\certs docker/ucp-agent-win:2.2.0 generate-certs ;                   
-} else {                                                                                                                        
-    echo "Using existing certs at C:\ProgramData\docker\daemoncerts" >> ~\userdata.log
-}                                                                                                                               
-
-echo "Restarting Docker daemon" >> ~\userdata.log
-Stop-Service docker;                                                                                                            
-dockerd --unregister-service;                                                                                                   
-dockerd -H npipe:// -H 0.0.0.0:2376 --tlsverify --tlscacert=C:\ProgramData\docker\daemoncerts\ca.pem --tlscert=C:\ProgramData\docker\daemoncerts\cert.pem --tlskey=C:\ProgramData\docker\daemoncerts\key.pem --register-service;                                
-Start-Service docker;                                                                                                           
-echo "Successfully set up Docker daemon" >> ~/.userdata.log
-
 
 echo "docker-ee - firewall rules.."  >> ~/userdata.log
 netsh advfirewall firewall add rule name="docker_80_in"    dir=in action=allow  protocol=TCP localport=80    | Out-Null;
@@ -237,9 +217,32 @@ $timestamp = Get-Date -Format o | foreach {$_ -replace ":", "."}
 echo "$timestamp : *** UserData Ended ***"  >> ~/userdata.log
 
 
+echo "docker-ee creating powershell script ~/configure-docker.ps1"  >> ~\userdata.log
+"# Powershell to configure docker daemon
+Restart-Service docker;
+
+# Setting up Docker daemon to listen on port 2376 with TLS
+if (!(Test-Path C:\ProgramData\docker\daemoncerts\key.pem)) {
+    New-Item -ItemType directory -Path C:\ProgramData\docker\daemoncerts | Out-Null;
+    docker run --rm -v C:\ProgramData\docker\daemoncerts:C:\certs docker/ucp-agent-win:2.2.2 generate-certs ;
+}
+Stop-Service docker;
+dockerd --unregister-service;
+dockerd -H npipe:// -H 0.0.0.0:2376 --tlsverify --tlscacert=C:\ProgramData\docker\daemoncerts\ca.pem --tlscert=C:\ProgramData\docker\daemoncerts\cert.pem --tlskey=C:\ProgramData\docker\daemoncerts\key.pem --register-service;
+Start-Service docker;
+
+# daemon setup script from container..
+docker container run --rm docker/ucp-agent-win:2.2.2 windows-script | powershell -noprofile -noninteractive -command 'Invoke-Expression -Command $input'
+
+# pull other cluster and test image
+docker image pull docker/ucp-dsinfo-win:2.2.2
+docker run microsoft/dotnet-samples:dotnetapp-nanoserver
+
+" | out-file ~/configure-docker.ps1
+
+
 $timestamp = Get-Date -Format o | foreach {$_ -replace ":", "."}
 echo "$timestamp : *** Now rebooting ***" >> ~\userdata.log
 Restart-Computer -Force
-
 
 </powershell>

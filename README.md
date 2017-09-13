@@ -19,9 +19,6 @@ This repo was developed using a Centos 7.3 AMI but should work with RHEL 7.3 als
     * Add your DOCKER_EE_URL as per standard Docker Store setup
     * Set required versions of UCP and DTR ex. 2.1.4 and 2.2.5
 
-  * terraform/terraform.tfvars - contains your AWS access key and secret values
-    * note: the key_name is the name of your AWS key without the .pem extension
-
 
 ### To run
 
