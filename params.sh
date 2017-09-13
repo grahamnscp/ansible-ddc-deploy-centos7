@@ -23,7 +23,8 @@ TF_AWS_UCP_WINWORK_COUNT=2
 #
 TF_AWS_MANAGER_INSTANCE_TYPE=t2.large
 TF_AWS_WORKER_INSTANCE_TYPE=t2.large
-TF_AWS_WINWORK_INSTANCE_TYPE=m4.xlarge
+TF_AWS_WINWORK_INSTANCE_TYPE=m4.xlarge # has issue with swarm join -> network related?
+TF_AWS_WINWORK_INSTANCE_TYPE=i3.xlarge
 TF_AWS_DTR_INSTANCE_TYPE=t2.large
 
 # Windows instance user_data variables
