@@ -6,5 +6,5 @@
 
 # Wish List
 
-  * Refector with decision logic to work on other target OS platforms, ex Ubuntu
+  * Refactor with decision logic to work on other target OS platforms, ex Ubuntu
 
