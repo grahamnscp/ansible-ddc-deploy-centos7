@@ -376,9 +376,9 @@ MANAGERS=`for (( i=1; i<=$NUM_MANAGERS; i++ )) ; do echo ${MANAGER_NAME[$i]} ; d
 WORKERS=`for (( i=1; i<=$NUM_WORKERS; i++ )) ; do echo ${WORKER_NAME[$i]} ; done`
 DTRS=`for (( i=1; i<=$NUM_DTRS; i++ )) ; do echo ${DTR_NAME[$i]} ; done`
 HOSTS="$MANAGERS $WORKERS $DTRS"
-#for host in $HOSTS ;  do echo "Connecting to host: ${host}..." ; ssh-keyscan -H $host >> ~/.ssh/known_hosts ; done
+for host in $HOSTS ;  do echo "Connecting to host: ${host}..." ; ssh-keyscan -H $host >> ~/.ssh/known_hosts ; done
 echo ">>> Loop through hosts to accept keys before running Ansible playbook (CTRL-D to disconnect from each host in loop).."
-#for host in $HOSTS ;  do echo "Connecting to host: ${host}..." ; ssh -i $ANSIBLE_SSH_PRIVATE_KEY_FILE $ANSIBLE_USER@$host ; done
+for host in $HOSTS ;  do echo "Connecting to host: ${host}..." ; ssh -i $ANSIBLE_SSH_PRIVATE_KEY_FILE $ANSIBLE_USER@$host ; done
 echo ">>> done."
 
 
