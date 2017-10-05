@@ -1,5 +1,8 @@
 # Automated Deploy of HA clustered Docker EE on AWS
 
+Made Private: 5th October 2017
+
+
 This repo contains a Terraform sub-directory that provisions AWS resources required to deploy an HA UCP cluster with an HA DTR cluster.
 
 There is a wrapper script called run-terraform.sh which generates the various configuration files required from the deployment from the personalised values specified in the params.sh file.
